@@ -13,7 +13,13 @@ const port = process.env.PORT || 3000;
 
 // ===== STEP 4: Middlewares =====
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://elegant-bistro.web.app"],
+    credentials: true,
+    optionsSuccessStatus: 200,
+  }),
+);
 
 // ===== STEP 5: Set up the database connection =====
 const client = new MongoClient(
