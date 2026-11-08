@@ -15,7 +15,8 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://elegant-bistro.web.app"],
+    // origin: ["http://localhost:5173"],
+    origin: ["https://elegant-bistro.web.app"],
     credentials: true,
     optionsSuccessStatus: 200,
   }),
@@ -30,6 +31,7 @@ const client = new MongoClient(
 const database = client.db("elegantBistroDB");
 const menusCollection = database.collection("menus");
 const reviewsCollection = database.collection("reviews");
+const cartsCollection = database.collection("carts");
 
 // ===== STEP 6: Function to CONNECT to the database =====
 async function connectToMongoDB() {
@@ -70,6 +72,16 @@ app.get("/reviews", async (req, res) => {
   } catch (error) {
     console.log("Error :", error);
     res.status(500).send({ message: "reviews data read problem" });
+  }
+});
+
+app.post("/carts", async (req, res) => {
+  try {
+    const cartItem = req.body;
+    const result = await cartsCollection.insertOne(cartItem);
+    res.send(result);
+  } catch (error) {
+    console.log(error);
   }
 });
 
