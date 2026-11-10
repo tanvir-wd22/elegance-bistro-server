@@ -15,8 +15,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(
   cors({
-    // origin: ["http://localhost:5173"],
-    origin: ["https://elegant-bistro.web.app"],
+    origin: ["http://localhost:5173", "https://elegant-bistro.web.app"],
     credentials: true,
     optionsSuccessStatus: 200,
   }),
@@ -50,28 +49,42 @@ async function disconnectFromMongoDB() {
   await client.close();
 }
 
-// ===== STEP 8: Routes (the URLs your server answers) =====
+// ===== STEP 8: Routes (the URLs server answers) =====
 app.get("/", (req, res) => {
   res.send("Our server is running!");
 });
 
+// --- MENUS RESOURCE ---
 app.get("/menus", async (req, res) => {
   try {
     const menusData = await menusCollection.find().toArray();
     res.send(menusData);
   } catch (error) {
-    console.log("Error:", error);
-    res.status(500).send({ message: "menus data read problem" });
+    console.log("menus data get error", error);
+    res.status(500).send({ message: "menus data get error" });
   }
 });
 
+// --- REVIEWS RESOURCE ---
 app.get("/reviews", async (req, res) => {
   try {
     const reviewsData = await reviewsCollection.find().toArray();
     res.send(reviewsData);
   } catch (error) {
-    console.log("Error :", error);
-    res.status(500).send({ message: "reviews data read problem" });
+    console.log("reviews data get error:", error);
+    res.status(500).send({ message: "reviews data get error" });
+  }
+});
+
+// --- CARTS RESOURCE ---
+app.get("/carts", async (req, res) => {
+  try {
+    const query = { buyerEmail: req.query.email };
+    const cartsData = await cartsCollection.find(query).toArray();
+    res.send(cartsData);
+  } catch (error) {
+    console.log("carts data get error", error);
+    res.status(500).send({ message: "carts data get error" });
   }
 });
 
@@ -81,7 +94,8 @@ app.post("/carts", async (req, res) => {
     const result = await cartsCollection.insertOne(cartItem);
     res.send(result);
   } catch (error) {
-    console.log(error);
+    console.log("carts data post error", error);
+    res.status(500).send({ message: "carts data post error" });
   }
 });
 
