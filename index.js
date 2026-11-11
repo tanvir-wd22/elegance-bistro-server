@@ -1,7 +1,7 @@
 // ===== STEP 1: Import the tools we need =====
 import express from "express";
 import cors from "cors";
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import dotenv from "dotenv";
 
 // ===== STEP 2: Read the .env file =====
@@ -96,6 +96,17 @@ app.post("/carts", async (req, res) => {
   } catch (error) {
     console.log("carts data post error", error);
     res.status(500).send({ message: "carts data post error" });
+  }
+});
+
+app.delete("/carts/:id", async (req, res) => {
+  try {
+    const query = { _id: new ObjectId(req.params.id) };
+    const result = await cartsCollection.deleteOne(query);
+    res.send(result);
+  } catch (error) {
+    console.log("carts data delete error", error);
+    res.status(500).send({ message: "carts data delete error" });
   }
 });
 
